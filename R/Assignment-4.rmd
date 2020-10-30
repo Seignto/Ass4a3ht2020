@@ -209,6 +209,14 @@ pnr_sex(pnr4)
 
 
 
+# 4.1 & 4.5
+Our vingett and package can be downloaded at
+
+https://github.com/Seignto/Ass4a3ht2020.git
+
+package name: Ass4a3ht2020
+
+
 #4.2 brute force search
 ```{r}
 set.seed (42)
