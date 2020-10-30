@@ -1,4 +1,5 @@
 #' @title A greedy heuristics aproximation for the knapsack problem
+#' @name greedy_knapsack
 #' @description The function calculates the combination of items to pack in a
 #' knapsack to maximize the value in the knapsack.
 #' @param x x' is a dataframe with observations of value of item and weight of item.

@@ -1,4 +1,5 @@
 #' @title A brute-force 0/1 solution for the knapsack problem
+#' @name brute_force_knapsack
 #' @description The function calculates the combination of items to pack in a
 #' knapsack to maximize the value in the knapsack given a weight restraint.
 #' @param x 'x' is a dataframe with observations of value of item and weight of item.
