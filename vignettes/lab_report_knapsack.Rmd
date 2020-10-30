@@ -1,0 +1,51 @@
+---
+title: "lab_report_knapsack"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{lab_report_knapsack}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(Ass4a3ht2020)
+```
+
+# Answers from Problem 4
+
+```{r}
+
+# 4.2 
+brute_force_knapsack(x = knapsack_objects [1: 8,], W = 3500)
+brute_force_knapsack(x = knapsack_objects [1:12,], W = 3500)
+brute_force_knapsack(x = knapsack_objects [1: 8,], W = 2000)
+brute_force_knapsack(x = knapsack_objects [1:12,], W = 2000)
+```
+Question How much time does it take to run the algorithm for n = 16 objects?
+
+Answer: 0.72
+
+# 4.3
+
+```{r}
+greedy_knapsack (x = knapsack_objects [1: 800,], W = 3500)
+greedy_knapsack (x = knapsack_objects [1: 1200,], W = 2000)
+```
+
+Question How much time does it take to run the algorithm for n = 1000000 objects?
+
+Answer: Elapsed 0.22
+So the aproximation is alot faster.
+
+# 4.4
+
+Question What performance gain could you get by trying to improve your code?
+
+Answer: Very lite, we could probably increase our gain if we used matrix algebra instead of for-loops. 

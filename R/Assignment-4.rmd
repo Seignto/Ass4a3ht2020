@@ -1,0 +1,375 @@
+---
+title: "Assigment 4 R-Programming HT2020"
+author: "Kristian Norgren & Henry Svedberg"
+date: '2020-10-30'
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# packet
+
+```{r}
+#install.packages('devtools')
+#install.packages('roxygen2')
+#install.packages('knitr')
+library('devtools')
+library('roxygen2')
+
+```
+
+# 1 apartement()
+```{r}
+apartement <- function(rooms, m2) {
+  if (rooms <=0) stop("It's not an apartement if it doesn't have any rooms!")
+  if(m2 <=0) stop("non-positive square meters")
+  rooms + m2
+  
+  lista <- list("rooms"=rooms, "square meters"=m2)
+  class(lista) <- "apartement"
+  return(lista)
+}
+
+
+print.apartement <- function(obj){
+  if (obj$rooms==1) {
+cat("A", obj$`square meters`, "square meter studio", sep=" " )
+  }
+  
+  else { string <- paste(obj$rooms, "room", sep="-") #denna del är för att få till så att sep blir ett bindestreck för antalet rum (som varia) och strängen "rum", medan det nedeånstående har ett mellanrum som sep
+    cat("A",obj$`square meters`, "square meter", string, "apartement", sep=" ")}
+}
+
+is.function(print.apartement)
+
+a <- apartement(1,25)
+print(a)
+print.apartement(a)
+
+a[[1]]
+a[[2]]
+
+apartement(3,81)
+b <- apartement(5,104)
+print(b)
+
+class(b)
+try(apartement(0,81))
+
+try(d <- apartement(2,0))
+```
+
+# 2 give_blood()
+```{r}
+library(lubridate)
+give_blood <- function(lasttime=today(), holiday=hemma, sex, type_of_travel=NULL){
+
+#kollar eventuell resa  
+if (holiday=="hemma") {extratime <- lasttime }
+else if(type_of_travel=="other") { extratime <- int_end(holiday) + weeks(4)}
+else if (type_of_travel=="malaria") {extratime <-int_end(holiday) + months(6) }
+  
+
+#kollar kön
+if(sex=="f") {suggestion <- lasttime + months(4)}
+else if(sex=="m") {suggestion <- lasttime + months(3)}
+  
+
+if (suggestion > extratime) {slutdatum <- suggestion}
+else {slutdatum <- extratime + days(1)}
+
+#kontrollerar veckodag.  enligt wday()-standard utgör söndagar första dagen på veckan (1)
+if(wday(slutdatum)==7 | wday(slutdatum)== 1 ) {
+  slutdatum <- ceiling_date(slutdatum, "week", week_start = 1) #specificerar att slutdatum skall börja nästa vecka där week_start manuellt sätts som måndag
+}
+
+year <- paste("year=", year(slutdatum), sep="") 
+
+month <- paste("month=", month(slutdatum, label=TRUE), sep="")
+
+day <- paste("day=", day(slutdatum), sep="")
+weekday <- paste("weekday=", wday(slutdatum, label = TRUE, abbr = FALSE), sep="")
+
+cat(year, month, day, weekday, sep = ", ")
+}
+
+Sys.setlocale("LC_TIME", "C")
+# test 1
+day1 <- ymd("2014-02-24")
+print(day1)
+ 
+give_blood(lasttime = day1, holiday = "hemma", sex="m", type_of_travel = NULL)
+
+
+give_blood(lasttime=day1, holiday="hemma", sex="f", type_of_travel=NULL)
+
+
+# test 2
+
+day2 <- ymd("2014-03-23")
+day3 <- ymd("2014-04-24")
+holiday1 <- interval(day2, day3)
+
+give_blood(lasttime=day1, holiday=holiday1, sex="m", type_of_travel = "malaria")
+
+give_blood(lasttime = day1, holiday = holiday1, sex="f", type_of_travel = "malaria")
+
+# Test 3
+day4 <- ymd("2014-04-13")
+day5 <- ymd("2014-05-23")
+holiday2 <- interval(day4, day5)
+
+give_blood(lasttime = day1, holiday = holiday2, sex="m", type_of_travel = "other")
+
+give_blood(lasttime = day1, holiday = holiday2, sex="f", type_of_travel = "other")
+
+
+
+```
+
+# 3
+
+```{r}
+# 3.1
+
+prn_ctrl <- function(pnr) {
+pnr_split <- strsplit(pnr, '')
+
+tvaett <- rep(2:1,4)
+tvaett <- append(tvaett, 2)
+tvaett
+
+temp <- c()
+for (i in pnr_split) {
+  temp = append(temp, as.numeric(i))
+  }
+
+pnr_split <- temp
+rm(temp)
+pnr_splitk <- pnr_split[3: (length(pnr_split) - 1)]
+
+p2 <- c()
+p1 <- c()
+for (i in 1:length(pnr_splitk)) {
+  b <- pnr_splitk[i] * tvaett[i]
+  if (b > 9) {
+    b <- as.character(b)
+    b <- strsplit(b, '')
+    b <- lapply(b, as.numeric)
+    b <- unlist(b) 
+    p2 <- append(p2, b)
+  } else {
+    p1 <- append(p1, b)
+ }
+}  
+
+summan_produkt <- sum(p1) + sum(p2)
+summan_produkt <- as.character(summan_produkt)
+summan_produkt <- strsplit(summan_produkt, '')
+summan_produkt <- unlist(summan_produkt)
+nummer <- 10 - as.numeric(summan_produkt[length(summan_produkt)])
+
+if (nummer == pnr_split[length(pnr_split)]) {return(T)}
+else {return(F)}
+}
+
+pnr1 <- '196408233234'
+pnr2 <- '190101010101'
+pnr3 <- '198112189876'
+pnr4 <- '190303030303'
+
+prn_ctrl(pnr1)
+prn_ctrl(pnr2)
+prn_ctrl(pnr3)
+prn_ctrl(pnr4)
+
+# 3.2
+pnr_sex <- function(pnr) {
+lista <- pnr
+lista <- unlist(strsplit(pnr, ''))
+  
+if (as.numeric(lista[length(lista) - 1])%%2 == 0) {return('F')
+} else 
+{return('M')}
+}
+pnr1 <- '196408233234'
+pnr2 <- '190202020202'
+pnr3 <- '198112189876'
+pnr4 <- '190303030303'
+
+pnr_sex(pnr1)
+pnr_sex(pnr2)
+pnr_sex(pnr3)
+pnr_sex(pnr4)
+
+```
+
+
+
+#4.2 brute force search
+```{r}
+set.seed (42)
+n <- 2000
+knapsack_objects <- data.frame(w = sample (1: 4000, size = n, replace = TRUE),v = runif(n = n, 0, 10000))
+
+brute_force_knapsack <- function (x, W){
+  if(is.data.frame(x)==F) stop( "x is not a dataframe")
+  if(any(variable.names(x)!=c("w","v"))) stop("incorrect variables")
+  if(any(x$v <0) | any(x$w)<0) stop("non-positive-numbers")
+
+#tar fram alla kombinationer av element
+number_of_items <- nrow(x)
+all_combinations_decimal <- 0:(2^number_of_items-1)
+all_combinations_matrix <- sapply(all_combinations_decimal, function(x){
+  result <- intToBits(x)
+  result <- as.numeric(result)
+  return(result[1:number_of_items])
+})
+
+  slutgiltigt_value <- 0 #skapar det som skall bli slutgiltigt resultat
+  
+  index_vek <- c()
+  for (i in 2:ncol(all_combinations_matrix)){ #börjar på 2 eftersom i kolumn 1 är alla element 0
+    for(j in 1:nrow(all_combinations_matrix)){
+      if(all_combinations_matrix[j, i]==1){
+        index_vek <- c(index_vek, j) #alla element i en kolumn som har en etta i kombinationsmatrisen sparas som sitt radnummer
+      }
+    }
+    weight_per_col_iteration <- sum(x$w[index_vek]) 
+    value_per_col_iteration <- sum(x$v[index_vek])
+    if((weight_per_col_iteration <=W & value_per_col_iteration > slutgiltigt_value)==TRUE){
+      slutgiltigt_value <- value_per_col_iteration
+      slutgiltig_vikt <- weight_per_col_iteration
+      slutgiltiga_element <- index_vek
+    } 
+    index_vek <- c() #återställer indexvektorn för nästa kolumn-iteration
+  } 
+lista <- list("value"= round(slutgiltigt_value, digits = 0), "weight" =slutgiltig_vikt, "elements"=slutgiltiga_element)
+return(lista)
+}
+brute_force_knapsack(x = knapsack_objects [1: 8,], W = 3500)
+brute_force_knapsack(x = knapsack_objects [1:12,], W = 3500)
+brute_force_knapsack(x = knapsack_objects [1: 8,], W = 2000)
+brute_force_knapsack(x = knapsack_objects [1:12,], W = 2000)
+
+# how long time it takes to run the algorithm for n=16 objects
+system.time(brute_force_knapsack(x = knapsack_objects [1: 16,], W = 3500))
+system.time(brute_force_knapsack(x = knapsack_objects [1: 16,], W = 2000))
+
+  
+```
+
+# 4.3  greedy heuristics
+```{r}
+set.seed (42) 
+n <- 2000
+knapsack_objects <- data.frame(w = sample (1: 4000, size = n, replace = TRUE),
+v = runif(n = n, 0, 10000))
+
+greedy_knapsack <- function(x, W){
+    if(is.data.frame(x)==F) stop( "x is not a dataframe")
+  if(any(variable.names(x)!=c("w","v"))) stop("incorrect variables")
+  if(any(x$v <0) | any(x$w)<0) stop("non-positive-numbers")
+  
+  #sorterar df
+value_weight <- x$v/x$w
+x <- cbind(x, value_weight)
+x<- x[order(x$value_weight, decreasing = TRUE) ,]
+  
+
+#startvärden för while-loop
+i <- 1
+sorted_elements <- c()
+total_value <- 0
+
+while (sum(x$w[1:i]) < W) {
+  total_value <- sum(x$v[1:i])
+  sorted_elements <- c(sorted_elements, i)
+  i <- i+1
+
+}
+original_elements <- as.numeric(rownames(x[sorted_elements, ]))
+lista <- list(value=total_value, elements=original_elements)
+return(lista)
+
+}
+greedy_knapsack (x = knapsack_objects [1: 800,], W = 3500)
+greedy_knapsack (x = knapsack_objects [1: 1200,], W = 2000)
+
+#how long time it takes for n= 1000000 objects
+set.seed (42) 
+n <- 1000000
+knapsack_objects1000000 <- data.frame(w = sample (1: 4000, size = n, replace = TRUE),
+v = runif(n = n, 0, 10000))
+
+system.time(greedy_knapsack (x = knapsack_objects1000000, W = 3500))
+system.time(greedy_knapsack (x = knapsack_objects1000000, W = 2000))
+
+
+#it is faster for the greedy_knapsack function to analyze 1000000 objects  compared to the time the original knapsack function took to analyze 16 objects
+
+```
+
+# 4.4
+
+```{r}
+
+library(profvis)
+profvis(system.time(brute_force_knapsack(x = knapsack_objects [1: 16,], W = 3500)))
+
+
+brute_force_knapsack_optimized <- function (x, W){
+  if(is.data.frame(x)==F) stop( "x is not a dataframe")
+  if(any(variable.names(x)!=c("w","v"))) stop("incorrect variables")
+  if(any(x$v <0) | any(x$w)<0) stop("non-positive-numbers")
+
+number_of_items <- nrow(x)
+all_combinations_decimal <- 0:(2^number_of_items-1)
+all_combinations_matrix <- vapply(all_combinations_decimal, function(x){
+  result <- intToBits(x)
+  result <- as.numeric(result)
+  return(result[1:number_of_items])
+}, numeric(number_of_items))
+#vapply istället för apply
+
+  slutgiltigt_value <- 0 
+  
+  index_vek <- c()
+  for (i in 2:ncol(all_combinations_matrix)){
+    for(j in 1:nrow(all_combinations_matrix)){
+      if(all_combinations_matrix[j, i]==1){
+        index_vek <- c(index_vek, j)
+      }
+    }
+    weight_per_col_iteration <- sum(x$w[index_vek]) 
+    value_per_col_iteration <- sum(x$v[index_vek])
+    if((weight_per_col_iteration <=W & value_per_col_iteration > slutgiltigt_value)==TRUE){
+      slutgiltigt_value <- value_per_col_iteration
+      slutgiltig_vikt <- weight_per_col_iteration
+      slutgiltiga_element <- index_vek
+    } 
+    index_vek <- c() 
+  } 
+lista <- list("value"= round(slutgiltigt_value, digits = 0), "weight" =slutgiltig_vikt, "elements"=slutgiltiga_element)
+return(lista)
+}
+
+# enligt Wickham:"vapply() is faster than sapply() because it pre-specifies the output type."
+
+#vi försökte ändra den nästade for-loopen till något annat som ex sapply eller apply men hade lite svårt att få det att fungera. 
+
+profvis(brute_force_knapsack_optimized(x = knapsack_objects [1: 16,], W = 3500))
+
+system.time(brute_force_knapsack_optimized(x = knapsack_objects [1: 16,], W = 3500))
+
+
+
+```
+
+
+
+
+
